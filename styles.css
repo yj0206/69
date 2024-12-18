@@ -1,0 +1,136 @@
+/* 重置样式，确保不同浏览器一致 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 页面基础样式 */
+body {
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #ff8c00, #ff5e3a);
+    color: #fff;
+    text-align: center;
+    padding: 50px 0;
+    min-height: 100vh; /* 设置页面最小高度为视口高度，确保背景能铺满整个屏幕高度 */
+    display: flex; /* 使用 Flex 布局，方便后续子元素的垂直和水平居中 */
+    flex-direction: column; /* 子元素按列排列 */
+    justify-content: center; /* 垂直居中 */
+    align-items: center; /* 水平居中 */
+}
+
+/* 主容器 */
+#main-container {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+    width: 80%;
+    max-width: 600px; /* 设置一个最大宽度，避免在大屏幕上过于宽 */
+    margin: 0 auto;
+}
+
+/* 标题部分样式 */
+header h1 {
+    font-size: 40px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    text-transform: uppercase; /* 将标题文字转换为大写，增加视觉效果 */
+    letter-spacing: 2px; /* 增加字母间距，使标题更有层次感 */
+}
+
+header p {
+    font-size: 20px;
+    font-style: italic; /* 使副标题文字为斜体，与标题区分开来 */
+}
+
+/* 游戏部分样式 */
+#game {
+    margin-top: 40px;
+}
+
+#start-button {
+    padding: 20px 40px;
+    background-color: #ff5e3a;
+    color: #fff;
+    font-size: 24px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* 增加按钮按下时的阴影效果 */
+}
+
+#start-button:hover {
+    background-color: #ff7f50;
+    transform: scale(1.1);
+}
+
+#start-button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    opacity: 0.8; /* 禁用时稍微降低按钮的透明度，增强视觉提示 */
+}
+
+/* 信息区域 */
+#message-container {
+    margin-top: 30px;
+    padding: 20px;
+    text-align: left;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin; /* 自定义滚动条宽度（适用于 Firefox 等浏览器） */
+    scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2); /* 自定义滚动条颜色（适用于 Firefox 等浏览器） */
+}
+
+/* 针对 Chrome、Safari 等浏览器自定义滚动条样式 */
+#message-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+#message-container::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#message-container::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+/* 每条消息的样式 */
+.info,.error,.success {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 0.6s ease-out;
+    word-break: break-word; /* 当消息内容过长时自动换行，避免溢出 */
+}
+
+/* 成功信息样式 */
+.success {
+    background-color: rgba(46, 204, 113, 0.7);
+    color: #27ae60;
+}
+
+/* 错误信息样式 */
+.error {
+    background-color: rgba(231, 76, 60, 0.7);
+    color: #e74c3c;
+}
+
+/* 消息淡入动画 */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

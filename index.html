@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寻宝冒险</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 引入音频文件 -->
+    <audio id="backgroundMusic" loop>
+        <source src="background_music.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放
+    </audio>
+</head>
+
+<body>
+    <div id="main-container">
+        <header>
+            <h1>寻宝冒险</h1>
+            <p>准备好开始冒险了吗？让我们一起探索隐藏的宝藏！</p>
+        </header>
+
+        <section id="game">
+            <button id="start-button">开始寻宝</button>
+            <div id="message-container"></div>
+        </section>
+    </div>
+
+    <!-- 添加音乐控制按钮 -->
+    <button id="music-control-button">播放音乐</button>
+
+    <!-- 新增用于输入玩家ID的输入框 -->
+    <input type="text" id="playerIdInput" placeholder="请输入玩家ID">
+    <!-- 新增用于输入玩家昵称的输入框 -->
+    <input type="text" id="nicknameInput" placeholder="请输入昵称">
+    <!-- 新增保存玩家信息按钮 -->
+    <button id="savePlayerInfoButton">保存玩家信息</button>
+    <!-- 新增获取玩家信息按钮 -->
+    <button id="getPlayerInfoButton">获取玩家信息</button>
+
+    <script src="treasureMap.js"></script>
+    <script>
+        const messageContainer = document.getElementById("message-container");
+        const startButton = document.getElementById("start-button");
+        const musicControlButton = document.getElementById("music-control-button");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+
+        // 切换音乐控制按钮的文本以及音乐的播放暂停状态
+        function toggleMusic() {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+                musicControlButton.textContent = "暂停音乐";
+            } else {
+                backgroundMusic.pause();
+                musicControlButton.textContent = "播放音乐";
+            }
+        }
+
+        // 为音乐控制按钮添加点击事件监听器
+        musicControlButton.addEventListener("click", toggleMusic);
+
+        // 显示游戏信息
+        function showMessage(message, type = "info") {
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add(type);
+            messageDiv.textContent = message;
+            messageContainer.appendChild(messageDiv);
+        }
+
+        // 新增函数，用于加载游戏元素数据
+        async function loadGameElements() {
+            try {
+                const response = await fetch('game_elements.txt');
+                if (!response.ok) {
+                    throw new Error('无法获取游戏元素文件');
+                }
+                const textData = await response.text();
+                // 这里可以根据实际的文本文件格式进行数据解析，例如如果是JSON格式可以用JSON.parse(textData)
+                // 目前假设文本文件每行是一个元素信息，简单分割展示示例
+                const elements = textData.split('\n');
+                showMessage('成功加载游戏元素：' + elements.join(', '));
+                return elements;
+            } catch (error) {
+                showMessage('加载游戏元素失败: ' + error.message, "error");
+            }
+        }
+
+        // 保存玩家信息到Web Storage
+        function savePlayerInfo(playerId, nickname) {
+            const playerInfo = {
+                id: playerId,
+                nickname: nickname,
+                gameHistory: [] // 这里可以后续根据实际游戏情况记录每次游戏的相关信息
+            };
+            localStorage.setItem('playerInfo', JSON.stringify(playerInfo));
+            showMessage('玩家信息已保存');
+        }
+
+        // 获取玩家信息
+        function getPlayerInfo() {
+            const playerInfoString = localStorage.getItem('playerInfo');
+            if (playerInfoString) {
+                return JSON.parse(playerInfoString);
+            }
+            return null;
+        }
+
+        // 启动寻宝游戏，修改了任务失败时的展示逻辑
+        async function startTreasureHunt() {
+            startButton.disabled = true;
+            showMessage("冒险开始！寻找第一个线索...");
+            const gameElements = await loadGameElements();
+            // 这里可以根据加载到的gameElements数据做进一步的游戏逻辑处理，目前仅做加载示例
+            try {
+                const clue = await TreasureMap.getInitialClue();
+                showMessage(clue);
+
+                const decodedLocation = await TreasureMap.decodeAncientScript(clue);
+                showMessage(decodedLocation);
+
+                const puzzleResult = await TreasureMap.solvePuzzle();
+                if (puzzleResult.includes("失败")) {
+                    const errorDetails = puzzleResult.match(/失败原因：(.*)/);
+                    const errorMessage = errorDetails? errorDetails[1] : "未知错误";
+                    showMessage("任务失败: " + errorMessage, "error");
+                } else {
+                    showMessage(puzzleResult, "success");
+                }
+
+                const box = await TreasureMap.searchTemple(decodedLocation);
+                showMessage(box);
+
+                const treasure = await TreasureMap.openTreasureBox();
+                showMessage(treasure, "success");
+            } catch (error) {
+                showMessage("任务出现意外错误: " + error.message, "error");
+            }
+
+            startButton.disabled = false;
+        }
+
+        startButton.addEventListener("click", startTreasureHunt);
+
+        // 为保存玩家信息按钮添加点击事件监听器
+        document.getElementById('savePlayerInfoButton').addEventListener('click', () => {
+            const playerId = document.getElementById('playerIdInput').value;
+            const nickname = document.getElementById('nicknameInput').value;
+            savePlayerInfo(playerId, nickname);
+        });
+
+        // 为获取玩家信息按钮添加点击事件监听器
+        document.getElementById('getPlayerInfoButton').addEventListener('click', () => {
+            const playerInfo = getPlayerInfo();
+            if (playerInfo) {
+                showMessage('玩家ID: ' + playerInfo.id + ', 昵称: ' + playerInfo.nickname);
+            } else {
+                showMessage('未找到玩家信息');
+            }
+        });
+    </script>
+</body>
+
+</html>
